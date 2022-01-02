@@ -7,6 +7,8 @@ The resulting database has a size of ~2 GB as of 01.01.2022.
 The scraper can be stopped and started safely.
 It will continue scraping where it was stopped.
 
+![overview diagram](./img/overview.drawio.png)
+
 ## Implementation
 
 index.golang.org is an index which serves a feed of new module versions that become
