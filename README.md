@@ -1,8 +1,10 @@
-# Go module proxy index scraper
+# Go module proxy scraper
 
-Scrapes all golang module versions indexed in the Google module proxy and
-stores the results in a sqlite database.
-The resulting database has a size of ~2 GB as of 01.01.2022.
+Scrapes all golang module versions and associated go.mod files indexed in the Google module
+proxy.
+The results are stored in a sqlite database.
+The resulting database has a size of 3.7 GB as of 14.01.2022 when skipping download of go.mod files
+for pre-releases.
 
 The scraper can be stopped and started safely.
 It will continue scraping where it was stopped.
@@ -25,8 +27,9 @@ Program logic:
 2. Determine `since` value from most recent entry in sqlite DB or default to beginning of time.
 3. Start goroutine that scrapes index continuously until the feed is fully consumed.
    Results are written to a channel. Result channel is closed once feed is fully consumed.
-4. Start goroutine that stores the results into a sqlite DB continuously.
-5. Exit program once scraping finished and all results were stored.
+4. Start goroutines that enrich the data (e.g. fetch go.mod).
+5. Start goroutine that stores the results into a sqlite DB continuously.
+6. Exit program once scraping finished and all results were stored.
 
 ## Motivation
 
@@ -93,8 +96,6 @@ limit 50;
 | go.spiff.io | 44 |
 | git.darknebu.la | 44 |
 | gist.github.com | 44 |
-
-The next step could be fetching all go.mod files and analyzing the module dependencies.
 
 ## References
 
