@@ -9,11 +9,15 @@ import (
 	"time"
 )
 
+var indexClient = &http.Client{
+	Timeout: 3 * time.Second,
+}
+
 func fetchFromIndexSince(since time.Time) ([]moduleVersion, error) {
 	timestamp := since.Format(time.RFC3339)
 	url := "https://index.golang.org/index?limit=" + strconv.Itoa(limit) + "&since=" + timestamp
 
-	resp, err := http.Get(url)
+	resp, err := indexClient.Get(url)
 	if err != nil {
 		return nil, err
 	}
