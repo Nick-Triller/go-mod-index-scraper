@@ -26,7 +26,13 @@ const (
 	// Wait for some time after each scrape request
 	scrapeDelay = 0 * time.Millisecond
 	tableDDL    = `
-CREATE TABLE IF NOT EXISTS moduleVersion (path TEXT not null, version TEXT not null, timestamp TEXT not null, PRIMARY KEY (path, version));
+CREATE TABLE IF NOT EXISTS moduleVersion (
+  path TEXT not null,
+  version TEXT not null,
+  timestamp TEXT not null,
+  isPreRelease BOOLEAN not null,
+  PRIMARY KEY (path, version)
+);
 CREATE INDEX IF NOT EXISTS timestamp_idx ON moduleVersion (timestamp);
 `
 	dbFileName = "gomodindex.sqlite"
@@ -163,12 +169,13 @@ func store(batches chan []moduleVersion, done chan struct{}, errChan chan error)
 	for batch := range batches {
 		// Insert all items from batch at once
 		valueStrings := make([]string, 0, len(batch))
-		valueArgs := make([]interface{}, 0, len(batch)*3)
+		valueArgs := make([]interface{}, 0, len(batch)*4)
 		for _, item := range batch {
-			valueStrings = append(valueStrings, "(?, ?, ?)")
+			valueStrings = append(valueStrings, "(?, ?, ?, ?)")
 			valueArgs = append(valueArgs, item.Path)
 			valueArgs = append(valueArgs, item.Version)
 			valueArgs = append(valueArgs, item.Timestamp)
+			valueArgs = append(valueArgs, isPreRelease(item.Version))
 		}
 		query := fmt.Sprintf("INSERT OR IGNORE INTO moduleVersion VALUES %s", strings.Join(valueStrings, ","))
 		_, err := db.Exec(query, valueArgs...)
