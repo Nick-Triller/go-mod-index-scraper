@@ -6,6 +6,7 @@ The resulting database has a size of ~2 GB as of 01.01.2022.
 
 The scraper can be stopped and started safely.
 It will continue scraping where it was stopped.
+Consequently, it can be re-run at any time to update the database with new entries.
 
 ![overview diagram](./img/overview.drawio.png)
 
